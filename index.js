@@ -1,48 +1,65 @@
-const { Telegraf, Markup } = require('telegraf')
+const { Telegraf, Markup, Context } = require('telegraf')
+
+    
 
 require('dotenv').config()
 
 const text = require("./const")
+
 const bot = new Telegraf(process.env.BOT)
-bot.start((ctx) => ctx.reply(`Hiii ${ctx.message.from.first_name ? ctx.message.from.first_name: 'Незнакомец'}!`))
-bot.help((ctx) => ctx.reply(text.commands))
-bot.command('course', async (ctx) => {
+
+// ==============================start=================================
+bot.start( async (ctx) => {
     try {
-        await ctx.replyWithHTML('<b>Kypсы</b>', Markup.inlineKeyboard([
-            [Markup.button.callback('Редакторы', 'btn_1'), Markup.button.callback('Обзоры', 'btn_2')],
-            [Markup.button.callback('Редакторы', 'btn_1'), Markup.button.callback('Обзоры', 'btn_2')]
-        ]))
-    } catch (error) {
-        console.error(error)
+        await ctx.replyWithAnimation({source: "./res/xtd.gif"})
+    } catch (e) {
+        console.error(e)
     }
+    
+    await ctx.replyWithHTML(`Привет ${ctx.message.from.first_name ? ctx.message.from.first_name: ''}` + text.startText)
+    try {
+        await ctx.replyWithHTML('<b>Выбери свой путь:</b>', Markup.inlineKeyboard([
+            [Markup.button.callback('Frontend', 'btn_front'), Markup.button.callback('Backend', 'btn_back')],
+            [Markup.button.callback('MobileDev', 'btn_mob'), Markup.button.callback('GameDev', 'btn_game')]
+        ]))
+    } catch (e) {
+        console.error(e)
+    }
+    
 })
 
-function addActionBot(name,src,text){
 
-    bot.action(name, async (ctx) => {
+
+
+
+//===============================front-three=====================================
+    bot.action("btn_front", async (ctx) => {
         try {
             await ctx.answerCbQuery()
-            if(src !== false){
-                await ctx.replyWithPhoto(
-                    {source: src}
-                )
-            }
-            await ctx.replyWithHTML(text, {disable_web_page_preview: true})
+            await ctx.replyWithHTML('<b>Выбери уровень своей мощи:</b>', Markup.inlineKeyboard([
+                [Markup.button.callback('Junior','btn_jun')],[Markup.button.callback('Middle','btn_mid')],
+                [Markup.button.callback('Назад','btn_back_1')]
+            ]))
         } catch (error) {
             console.error(error)
         }
     })
-}
-addActionBot('btn_1', './img/Java_logo.png',text.text1)
-addActionBot('btn_2', './img/JavaScript-1.jpg',text.text2)
-addActionBot('btn_3', false,text.tex3)
-addActionBot('btn_4', './img/swift-og.png',text.tex4)
 
-
+//=============================front-jun=================================================
+    bot.action("btn_jun", async (ctx) => {
+        try {
+            await ctx.answerCbQuery()
+            await ctx.replyWithHTML('<b>Выбери где будешь питать силу:</b>', Markup.inlineKeyboard([
+                [Markup.button.callback('Справочник','btn_jun_sprv'),Markup.button.callback('Марафон','btn_mid_mrfn')],
+                [Markup.button.callback('Таймер','btn_jun_t'),Markup.button.callback('Чтиво','btn_mid_ch')]
+            ]))
+        } catch (error) {
+            console.error(error)
+        }
+    })
 
 bot.launch()
 
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'))
 process.once('SIGTERM', () => bot.stop('SIGTERM'))
-
